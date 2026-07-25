@@ -1,9 +1,6 @@
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 
-from pyspark import pipelines as dp
-from pyspark.sql import functions as F
-
 @dp.table(
     name="proyecto_final.bronze.clientes_raw",
     comment="Entidad maestra con la información de los clientes de la tienda.",
