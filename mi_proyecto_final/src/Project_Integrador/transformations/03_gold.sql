@@ -88,3 +88,4 @@ SELECT
 FROM proyecto_final.silver.detalle_pedidos dp
 INNER JOIN proyecto_final.silver.pedidos pe
   ON dp.order_id = pe.order_id;
+  

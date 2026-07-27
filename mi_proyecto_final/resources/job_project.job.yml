@@ -1,0 +1,11 @@
+resources:
+  jobs:
+    Job_Project:
+      name: Job_Project
+      tasks:
+        - task_key: Execute_Pipeline
+          pipeline_task:
+            pipeline_id: 03ac89ef-751a-4789-b368-f22dd067eaae
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED

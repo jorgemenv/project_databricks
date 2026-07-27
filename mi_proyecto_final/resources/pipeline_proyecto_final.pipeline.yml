@@ -1,0 +1,14 @@
+id: 03ac89ef-751a-4789-b368-f22dd067eaae
+pipeline_type: WORKSPACE
+name: Project_Integrador
+libraries:
+  - glob:
+      include: /Workspace/Users/jorge.mendozav88@gmail.com/project_databricks/mi_proyecto_final/src/Project_Integrador/transformations/**
+schema: default
+continuous: false
+development: false
+photon: true
+channel: CURRENT
+catalog: workspace
+serverless: true
+root_path: /Workspace/Users/jorge.mendozav88@gmail.com/project_databricks/mi_proyecto_final/src/Project_Integrador/transformations
