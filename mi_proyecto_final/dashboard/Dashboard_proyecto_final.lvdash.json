@@ -1,0 +1,379 @@
+{
+  "datasets": [
+    {
+      "name": "de070bb5",
+      "displayName": "Ventas del mes",
+      "queryLines": [
+        "--ventas del mes\r\n",
+        "SELECT\r\n",
+        "  df.anio,\r\n",
+        "  df.mes,\r\n",
+        "  dc.full_name,\r\n",
+        "  SUM(f.monto_total) AS ventas_mes\r\n",
+        "FROM proyecto_final.gold.fact_ventas f\r\n",
+        "JOIN proyecto_final.gold.dim_cliente dc ON f.customer_key = dc.customer_key\r\n",
+        "JOIN proyecto_final.gold.dim_fecha df ON f.date_key = df.date_key\r\n",
+        "GROUP BY df.anio, df.mes, dc.full_name;"
+      ]
+    },
+    {
+      "name": "productos_mas_vendidos",
+      "displayName": "Productos Más Vendidos",
+      "queryLines": [
+        "SELECT\n",
+        "  dpd.nombre_producto,\n",
+        "  dpd.categoria,\n",
+        "  SUM(f.cantidad) AS total_cantidad_vendida,\n",
+        "  SUM(f.monto_total) AS total_ventas,\n",
+        "  COUNT(DISTINCT f.order_id) AS total_ordenes,\n",
+        "  AVG(f.precio_unitario) AS precio_promedio\n",
+        "FROM\n",
+        "  proyecto_final.gold.fact_ventas f\n",
+        "    JOIN proyecto_final.gold.dim_producto dpd\n",
+        "      ON f.product_key = dpd.product_key\n",
+        "GROUP BY\n",
+        "  dpd.nombre_producto,\n",
+        "  dpd.categoria\n",
+        "ORDER BY\n",
+        "  total_cantidad_vendida DESC"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "ventas_mes",
+      "displayName": "Dashboard Principal",
+      "layout": [
+        {
+          "widget": {
+            "name": "total_ventas",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "de070bb5",
+                  "fields": [
+                    {
+                      "name": "sum(ventas_mes)",
+                      "expression": "SUM(`ventas_mes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Ventas Totales del Período",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(ventas_mes)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "total_clientes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "de070bb5",
+                  "fields": [
+                    {
+                      "name": "countdistinct(full_name)",
+                      "expression": "COUNT(DISTINCT `full_name`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Total Clientes",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(full_name)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_ventas",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "de070bb5",
+                  "fields": [
+                    {
+                      "name": "avg(ventas_mes)",
+                      "expression": "AVG(`ventas_mes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Promedio Ventas por Cliente",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(ventas_mes)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "top_clientes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "de070bb5",
+                  "fields": [
+                    {
+                      "name": "full_name",
+                      "expression": "`full_name`"
+                    },
+                    {
+                      "name": "sum(ventas_mes)",
+                      "expression": "SUM(`ventas_mes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Top 10 Clientes por Ventas",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "full_name",
+                  "displayName": "clientes",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(ventas_mes)",
+                  "displayName": "ventas_mes",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "full_name",
+                  "displayName": "full_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tabla_detalle",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "de070bb5",
+                  "fields": [
+                    {
+                      "name": "anio",
+                      "expression": "`anio`"
+                    },
+                    {
+                      "name": "mes",
+                      "expression": "`mes`"
+                    },
+                    {
+                      "name": "full_name",
+                      "expression": "`full_name`"
+                    },
+                    {
+                      "name": "ventas_mes",
+                      "expression": "`ventas_mes`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Detalle de Ventas Mensuales por Cliente",
+                "showTitle": true
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "anio"
+                  },
+                  {
+                    "fieldName": "mes"
+                  },
+                  {
+                    "fieldName": "full_name"
+                  },
+                  {
+                    "fieldName": "ventas_mes"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "aad69400",
+      "displayName": "Productos mas vendidos",
+      "layout": [
+        {
+          "widget": {
+            "name": "f1ac0042",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "productos_mas_vendidos",
+                  "fields": [
+                    {
+                      "name": "nombre_producto",
+                      "expression": "`nombre_producto`"
+                    },
+                    {
+                      "name": "sum(total_cantidad_vendida)",
+                      "expression": "SUM(`total_cantidad_vendida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Top 10 Productos Más Vendidos",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "nombre_producto",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(total_cantidad_vendida)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 0,
+            "width": 8,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
